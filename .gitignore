@@ -1,2 +1,3 @@
 go-docker-deploy
 .idea/*
+conf/settings.json
