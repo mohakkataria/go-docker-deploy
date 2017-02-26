@@ -1,0 +1,10 @@
+{
+  "hosts" : [
+    {
+      "ip" : "x.x.x.x",
+      "port": "22",
+      "user" : "core",
+      "private_key_file_path" : "/Users/mohak/Downloads/appbase"
+    }
+  ]
+}
