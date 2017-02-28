@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/mohakkataria/go-docker-deploy/models"
 	"github.com/mitchellh/mapstructure"
+	"encoding/json"
 )
 
 // Operations about object
@@ -17,19 +18,39 @@ type DeployController struct {
 func (this *DeployController) Deploy() {
 	var requestObj models.DockerContainer
 
-	if len(this.Ctx.Request.Form) == 0 {
-		this.Data["json"] = map[string]interface{}{"message": "Empty request", "status": "failed"}
-		this.ServeJSON()
-		return
-	}
-
-	if err := this.ParseForm(&requestObj); err != nil {
-		this.Data["json"] = map[string]interface{}{"message": "Invalid request format", "status": "failed"}
+	reqObj := this.Ctx.Input.RequestBody
+	if err := json.Unmarshal(reqObj, &requestObj); err != nil {
+		this.Data["json"] = map[string]interface{}{"message": "Invalid input data : " + err.Error(), "status": "failed"}
 		this.ServeJSON()
 		return
 	}
 
 	logs.Info("[Request][Deploy] : ", requestObj)
+
+	var host models.Host
+	results := make(chan map[string]string, 10)
+	defer close(results)
+
+	hostsFromConfig := viper.Get("hosts").([]interface{})
+	for _, hostFromConfig := range hostsFromConfig {
+		mapstructure.Decode(hostFromConfig, &host)
+		go func(host models.Host) {
+			results <- requestObj.Deploy(host)
+		}(host)
+
+	}
+
+	returnDeployStatuses := []map[string]string{}
+
+	for i := 0; i < len(hostsFromConfig); i++ {
+		select {
+		case res := <-results:
+			returnDeployStatuses = append(returnDeployStatuses, res)
+		}
+	}
+
+	this.Data["json"] = returnDeployStatuses
+	this.ServeJSON()
 }
 
 func (this *DeployController) DeployStatus() {
