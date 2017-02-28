@@ -1,14 +1,14 @@
 package main
 
 import (
-	_ "github.com/mohakkataria/go-docker-deploy/routers"
-	"github.com/astaxie/beego"
-	"github.com/spf13/viper"
 	"fmt"
-	"path/filepath"
-	"path"
-	"os"
+	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
+	_ "github.com/mohakkataria/go-docker-deploy/routers"
+	"github.com/spf13/viper"
+	"os"
+	"path"
+	"path/filepath"
 )
 
 func main() {

@@ -8,8 +8,8 @@
 package routers
 
 import (
-	"github.com/mohakkataria/go-docker-deploy/controllers"
 	"github.com/astaxie/beego"
+	"github.com/mohakkataria/go-docker-deploy/controllers"
 )
 
 func init() {

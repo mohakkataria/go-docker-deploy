@@ -1,10 +1,10 @@
 package sshManager
 
 import (
+	"bytes"
+	"fmt"
 	"golang.org/x/crypto/ssh"
 	"io/ioutil"
-	"fmt"
-	"bytes"
 )
 
 func ExecuteCmd(command string, host string, port string, pvtKeyFilePath string, user string) (string, error) {
