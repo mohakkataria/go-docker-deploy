@@ -1,13 +1,13 @@
 package controllers
 
 import (
-	_ "github.com/mohakkataria/go-docker-deploy/payloads"
+	"encoding/json"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
-	"github.com/spf13/viper"
-	"github.com/mohakkataria/go-docker-deploy/models"
 	"github.com/mitchellh/mapstructure"
-	"encoding/json"
+	"github.com/mohakkataria/go-docker-deploy/models"
+	_ "github.com/mohakkataria/go-docker-deploy/payloads"
+	"github.com/spf13/viper"
 )
 
 // Operations about object
@@ -65,7 +65,7 @@ func (this *DeployController) DeployStatus() {
 	logs.Info("[Request][DeployStatus] : ", dockerName)
 
 	dockerContainer := models.DockerContainer{
-		Name:dockerName,
+		Name: dockerName,
 	}
 
 	var host models.Host
@@ -108,7 +108,7 @@ func (this *DeployController) Stop() {
 	logs.Info("[Request][Stop] : ", dockerName)
 
 	dockerContainer := models.DockerContainer{
-		Name:dockerName,
+		Name: dockerName,
 	}
 
 	var host models.Host
@@ -135,6 +135,5 @@ func (this *DeployController) Stop() {
 
 	this.Data["json"] = returnStopStatuses
 	this.ServeJSON()
-
 
 }
