@@ -25,10 +25,10 @@ func init() {
 	logs.EnableFuncCallDepth(true)
 	logs.SetLogFuncCallDepth(3)
 
-	path_of_executable, _ := filepath.Abs(path.Dir(os.Args[0]))
+	pathOfExecutable, _ := filepath.Abs(path.Dir(os.Args[0]))
 	viper.SetConfigName("settings")
 	viper.SetConfigType("json")
-	viper.AddConfigPath(path_of_executable + "/conf")
+	viper.AddConfigPath(pathOfExecutable + "/conf")
 	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil {             // Handle errors reading the config file
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
