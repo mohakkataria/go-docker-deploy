@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 )
 
+// ExecuteCmd -- Execute the command on remote using ssh
 func ExecuteCmd(command string, host string, port string, pvtKeyFilePath string, user string) (string, error) {
 	session, err := connect(host, port, pvtKeyFilePath, user)
 	if err != nil {

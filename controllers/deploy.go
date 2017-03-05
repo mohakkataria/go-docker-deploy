@@ -6,22 +6,22 @@ import (
 	"github.com/astaxie/beego/logs"
 	"github.com/mitchellh/mapstructure"
 	"github.com/mohakkataria/go-docker-deploy/models"
-	_ "github.com/mohakkataria/go-docker-deploy/payloads"
 	"github.com/spf13/viper"
 )
 
-// Operations about object
+// DeployController - Controller for deploy apis
 type DeployController struct {
 	beego.Controller
 }
 
-func (this *DeployController) Deploy() {
+// Deploy - to deploy a docker image using the json input
+func (dc *DeployController) Deploy() {
 	var requestObj models.DockerContainer
 
-	reqObj := this.Ctx.Input.RequestBody
+	reqObj := dc.Ctx.Input.RequestBody
 	if err := json.Unmarshal(reqObj, &requestObj); err != nil {
-		this.Data["json"] = map[string]interface{}{"message": "Invalid input data : " + err.Error(), "status": "failed"}
-		this.ServeJSON()
+		dc.Data["json"] = map[string]interface{}{"message": "Invalid input data : " + err.Error(), "status": "failed"}
+		dc.ServeJSON()
 		return
 	}
 
@@ -49,16 +49,17 @@ func (this *DeployController) Deploy() {
 		}
 	}
 
-	this.Data["json"] = returnDeployStatuses
-	this.ServeJSON()
+	dc.Data["json"] = returnDeployStatuses
+	dc.ServeJSON()
 }
 
-func (this *DeployController) DeployStatus() {
+// DeployStatus -- Check the deploy status of docker container
+func (dc *DeployController) DeployStatus() {
 	var dockerName string
-	if err := this.Ctx.Input.Bind(&dockerName, "name"); err != nil {
+	if err := dc.Ctx.Input.Bind(&dockerName, "name"); err != nil {
 		logs.Info("[Request][DeployStatus] : ", err)
-		this.Data["json"] = map[string]interface{}{"message": "No Docker Name specified", "status": "failed"}
-		this.ServeJSON()
+		dc.Data["json"] = map[string]interface{}{"message": "No Docker Name specified", "status": "failed"}
+		dc.ServeJSON()
 		return
 	}
 
@@ -90,18 +91,19 @@ func (this *DeployController) DeployStatus() {
 		}
 	}
 
-	this.Data["json"] = returnDeployStatuses
-	this.ServeJSON()
+	dc.Data["json"] = returnDeployStatuses
+	dc.ServeJSON()
 
 }
 
-func (this *DeployController) Stop() {
+// Stop -- stop a docker
+func (dc *DeployController) Stop() {
 
 	var dockerName string
-	if err := this.Ctx.Input.Bind(&dockerName, "name"); err != nil {
+	if err := dc.Ctx.Input.Bind(&dockerName, "name"); err != nil {
 		logs.Info("[Request][Stop] : ", err)
-		this.Data["json"] = map[string]interface{}{"message": "No Docker Name specified", "status": "failed"}
-		this.ServeJSON()
+		dc.Data["json"] = map[string]interface{}{"message": "No Docker Name specified", "status": "failed"}
+		dc.ServeJSON()
 		return
 	}
 
@@ -133,7 +135,7 @@ func (this *DeployController) Stop() {
 		}
 	}
 
-	this.Data["json"] = returnStopStatuses
-	this.ServeJSON()
+	dc.Data["json"] = returnStopStatuses
+	dc.ServeJSON()
 
 }
