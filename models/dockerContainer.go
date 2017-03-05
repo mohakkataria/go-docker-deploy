@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+//DockerContainer -- struct for the DockerContainer properties
 type DockerContainer struct {
 	Name            string `json:"name"`
 	Image           string `json:"image"`
@@ -14,92 +15,98 @@ type DockerContainer struct {
 	Volumes         string `json:"volumes"`
 }
 
-func (this *DockerContainer) Deploy(host Host) map[string]string {
+//Deploy - Method to deploy a container into a host
+func (dc *DockerContainer) Deploy(host Host) map[string]string {
 	command := "docker run -d -it "
 
-	if this.Name != "" {
-		command += " --name " + this.Name
+	if dc.Name != "" {
+		command += " --name " + dc.Name
 	}
 
-	for _, value := range strings.Split(this.Volumes, ";") {
+	for _, value := range strings.Split(dc.Volumes, ";") {
 		if value != "" {
 			command = command + " -v " + value
 		}
 	}
 
-	for _, value := range strings.Split(this.Ports, ";") {
+	for _, value := range strings.Split(dc.Ports, ";") {
 		if value != "" {
 			command = command + " -p " + value
 		}
 	}
 
-	if this.Image != "" {
-		command += " " + this.Image
+	if dc.Image != "" {
+		command += " " + dc.Image
 	} else {
 		return map[string]string{
-			"host":   host.Ip,
+			"host":   host.IP,
 			"output": "Missing Image",
 		}
 	}
 
-	if this.Command != "" {
-		command += "  " + this.Command
+	if dc.Command != "" {
+		command += "  " + dc.Command
 	}
-	output, err := sshManager.ExecuteCmd(command, host.Ip, host.Port, host.PrivateKeyFilePath, host.User)
+	output, err := sshManager.ExecuteCmd(command, host.IP, host.Port, host.PrivateKeyFilePath, host.User)
 	if err != nil {
 		return map[string]string{
-			"host":   host.Ip,
+			"host":   host.IP,
 			"output": err.Error(),
 		}
-	} else {
-		return map[string]string{
-			"host":   host.Ip,
-			"output": output,
-		}
 	}
+
+	return map[string]string{
+		"host":   host.IP,
+		"output": output,
+	}
+
 }
 
-func (this *DockerContainer) GetDeploymentStatus(host Host) map[string]string {
-	command := "docker ps --filter \"name=" + this.Name + "\" --format \"{{.Status}}\""
-	output, err := sshManager.ExecuteCmd(command, host.Ip, host.Port, host.PrivateKeyFilePath, host.User)
+//GetDeploymentStatus - Method to get deployment status of a container into a host
+func (dc *DockerContainer) GetDeploymentStatus(host Host) map[string]string {
+	command := "docker ps --filter \"name=" + dc.Name + "\" --format \"{{.Status}}\""
+	output, err := sshManager.ExecuteCmd(command, host.IP, host.Port, host.PrivateKeyFilePath, host.User)
 	if err != nil {
 		return map[string]string{
-			"host":   host.Ip,
+			"host":   host.IP,
 			"output": err.Error(),
 		}
-	} else {
-		splitOutput := strings.Split(output, "\n")
-
-		if len(splitOutput) > 1 {
-			output = splitOutput[0]
-		} else {
-			output = "Container Not Running"
-		}
-
-		return map[string]string{
-			"host":   host.Ip,
-			"output": output,
-		}
 	}
+
+	splitOutput := strings.Split(output, "\n")
+
+	if len(splitOutput) > 1 {
+		output = splitOutput[0]
+	} else {
+		output = "Container Not Running"
+	}
+
+	return map[string]string{
+		"host":   host.IP,
+		"output": output,
+	}
+
 }
 
-func (this *DockerContainer) Stop(host Host) map[string]string {
-	command := "docker rm -f " + this.Name + "; echo $?"
-	output, err := sshManager.ExecuteCmd(command, host.Ip, host.Port, host.PrivateKeyFilePath, host.User)
+//Stop - Method to stop a container on a host
+func (dc *DockerContainer) Stop(host Host) map[string]string {
+	command := "docker rm -f " + dc.Name + "; echo $?"
+	output, err := sshManager.ExecuteCmd(command, host.IP, host.Port, host.PrivateKeyFilePath, host.User)
 	if err != nil {
 		return map[string]string{
-			"host":   host.Ip,
+			"host":   host.IP,
 			"output": err.Error(),
 		}
-	} else {
-		if strings.Contains(output, this.Name) {
-			output = "Container stopped"
-		} else {
-			output = "No container by that name was running"
-		}
-		return map[string]string{
-			"host":   host.Ip,
-			"output": output,
-		}
 	}
+
+	if strings.Contains(output, dc.Name) {
+		output = "Container stopped"
+	} else {
+		output = "No container by that name was running"
+	}
+	return map[string]string{
+		"host":   host.IP,
+		"output": output,
+	}
+
 }
